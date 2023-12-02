@@ -4,8 +4,8 @@ import numpy as np
 import torch
 import torchaudio
 
-from src.command_dataset import CommandDataset
-from src.noise_dataset import NoiseDataset
+from src.datasets.command_dataset import CommandDataset
+from src.datasets.noise_dataset import NoiseDataset
 
 # when editing, don't forget to add the path to .gitignore file
 DATASETS_ROOT = os.path.abspath('../data')
