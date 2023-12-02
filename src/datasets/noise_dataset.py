@@ -2,13 +2,16 @@ import soundata
 import torch
 from torchaudio.transforms import Resample
 
+from src.constants import SAMPLING_RATE, BACKGROUND_NOISE_DURATION
+
+
 class NoiseDataset:
-    def __init__(self, root, duration, sample_rate):
+    def __init__(self, root):
         self.dataset = soundata.initialize('urbansound8k', root)
         self.dataset.download()
         self.dataset.validate()
-        self.resampler = Resample(44100, sample_rate)
-        self.sample_count = duration * sample_rate
+        self.resampler = Resample(44100, SAMPLING_RATE)
+        self.sample_count = BACKGROUND_NOISE_DURATION * SAMPLING_RATE
 
     def random(self):
         audio, sample_rate = self.dataset.choice_clip().audio

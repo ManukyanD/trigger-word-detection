@@ -6,18 +6,7 @@ import torchaudio
 
 from src.datasets.command_dataset import CommandDataset
 from src.datasets.noise_dataset import NoiseDataset
-
-# when editing, don't forget to add the path to .gitignore file
-DATASETS_ROOT = os.path.abspath('../data')
-NOISE_DATASET_PATH = os.path.join(DATASETS_ROOT, 'noise_dataset')
-COMMAND_DATASET_PATH = os.path.join(DATASETS_ROOT, 'commands_dataset')
-BACKGROUND_NOISE_DURATION = 12
-SAMPLING_RATE = 16000
-TRIGGER_WORD = 'marvin'
-TRAINING_DATASET_PATH = os.path.join(DATASETS_ROOT, 'training')
-TRAINING_EXAMPLES_COUNT = 20000
-MAX_POSITIVES_COUNT_IN_EXAMPLE = 4
-MAX_NEGATIVES_COUNT_IN_EXAMPLE = 5
+from src.constants import *
 
 
 def construct_example(noise, positives, negatives):
@@ -55,13 +44,17 @@ def are_overlapping(start, end, previous_segments):
     return False
 
 
-noise_dataset = NoiseDataset(NOISE_DATASET_PATH, BACKGROUND_NOISE_DURATION, SAMPLING_RATE)
-command_dataset = CommandDataset(COMMAND_DATASET_PATH, TRIGGER_WORD, SAMPLING_RATE)
+def abs_path(*paths):
+    return os.path.abspath(os.path.join(*paths))
 
-examples_path = os.path.join(TRAINING_DATASET_PATH, 'examples')
+
+noise_dataset = NoiseDataset(abs_path('../', NOISE_DATASET_PATH))
+command_dataset = CommandDataset(abs_path('../', COMMAND_DATASET_PATH))
+
+examples_path = abs_path('../', TRAINING_DATASET_PATH, 'examples')
 os.makedirs(examples_path, exist_ok=True)
 
-labels_path = os.path.join(TRAINING_DATASET_PATH, 'labels')
+labels_path = abs_path('../', TRAINING_DATASET_PATH, 'labels')
 os.makedirs(labels_path, exist_ok=True)
 
 print('Generating dataset')
