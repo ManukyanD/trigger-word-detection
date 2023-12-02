@@ -51,10 +51,10 @@ def abs_path(*paths):
 noise_dataset = NoiseDataset(abs_path('../', NOISE_DATASET_PATH))
 command_dataset = CommandDataset(abs_path('../', COMMAND_DATASET_PATH))
 
-examples_path = abs_path('../', TRAINING_DATASET_PATH, 'examples')
+examples_path = abs_path('../', TRAINING_EXAMPLES_PATH)
 os.makedirs(examples_path, exist_ok=True)
 
-labels_path = abs_path('../', TRAINING_DATASET_PATH, 'labels')
+labels_path = abs_path('../', TRAINING_LABELS_PATH)
 os.makedirs(labels_path, exist_ok=True)
 
 print('Generating dataset')

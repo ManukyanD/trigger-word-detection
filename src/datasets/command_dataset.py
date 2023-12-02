@@ -6,7 +6,7 @@ import torchaudio
 from torchaudio.datasets import SPEECHCOMMANDS
 from torchaudio.transforms import Resample
 
-from src.constants import SAMPLING_RATE, TRIGGER_WORD
+from src.constants import EXAMPLE_SAMPLING_RATE, TRIGGER_WORD
 
 
 class CommandDataset(SPEECHCOMMANDS):
@@ -20,7 +20,7 @@ class CommandDataset(SPEECHCOMMANDS):
         positive_path_prefix = os.path.join(root, TRIGGER_WORD)
         self.positives = [path for path in example_files_list if path.startswith(positive_path_prefix)]
         self.negatives = [path for path in example_files_list if not path.startswith(positive_path_prefix)]
-        self.resampler = Resample(16000, SAMPLING_RATE)
+        self.resampler = Resample(16000, EXAMPLE_SAMPLING_RATE)
 
     def random_negative(self):
         audio, sample_rate = torchaudio.load(self.negatives[np.random.randint(low=0, high=len(self.negatives))])
