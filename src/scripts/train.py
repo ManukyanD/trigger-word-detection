@@ -11,6 +11,8 @@ project_root = os.path.abspath(os.path.join('..', '..'))
 summary_writer = SummaryWriter()
 checkpoint_path = os.path.join(project_root, CHECKPOINT_PATH)
 os.makedirs(checkpoint_path, exist_ok=True)
+result_model_path = os.path.join(project_root, RESULT_PATH, 'model.pt')
+os.makedirs(os.path.join(project_root, RESULT_PATH))
 
 
 def fit(epochs, lr, model, train_loader, val_loader, opt_func):
@@ -48,6 +50,7 @@ def print_loss(tag, loss, epoch):
 
 def checkpoint(model, filename):
     torch.save(model, os.path.join(checkpoint_path, filename))
+    torch.save(model, result_model_path)
 
 
 model = TriggerWordDetectionModel()

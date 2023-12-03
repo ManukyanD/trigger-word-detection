@@ -1,9 +1,10 @@
 import os
 
-CHECKPOINT_PATH = 'results'
+RESULT_PATH = 'results'
+CHECKPOINT_PATH = 'checkpoints'  # when editing, don't forget to add the path to .gitignore file
 
 # dataset path constants
-DATASETS_ROOT = 'data' # when editing, don't forget to add the path to .gitignore file
+DATASETS_ROOT = 'data'  # when editing, don't forget to add the path to .gitignore file
 NOISE_DATASET_PATH = os.path.join(DATASETS_ROOT, 'noise_dataset')
 COMMAND_DATASET_PATH = os.path.join(DATASETS_ROOT, 'commands_dataset')
 TRAINING_EXAMPLES_PATH = os.path.join(DATASETS_ROOT, 'training', 'examples')

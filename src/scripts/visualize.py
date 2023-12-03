@@ -1,7 +1,7 @@
 import os
 
 from src.datasets.trigger_word_detection_dataset import TriggerWordDetectionDataset
-from src.util.constants import TRAINING_EXAMPLES_PATH, TRAINING_LABELS_PATH, CHECKPOINT_PATH
+from src.util.constants import TRAINING_EXAMPLES_PATH, TRAINING_LABELS_PATH, RESULT_PATH
 
 import matplotlib.pyplot as plt
 import torch
@@ -9,8 +9,8 @@ import numpy as np
 
 project_root = os.path.abspath(os.path.join('..', '..'))
 
-checkpoint_filename = 'epoch-20.pt'
-model = torch.load(os.path.join(project_root, CHECKPOINT_PATH, checkpoint_filename))
+model_path = os.path.join(project_root, RESULT_PATH, 'model.pt')
+model = torch.load(model_path)
 model.eval()
 
 dataset = TriggerWordDetectionDataset(os.path.join(project_root, TRAINING_EXAMPLES_PATH),
