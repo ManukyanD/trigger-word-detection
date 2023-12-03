@@ -1,14 +1,17 @@
 import os
 
+CHECKPOINT_PATH = 'results'
+
 # when editing, don't forget to add the path to .gitignore file
 DATASETS_ROOT = 'data'
 NOISE_DATASET_PATH = os.path.join(DATASETS_ROOT, 'noise_dataset')
 COMMAND_DATASET_PATH = os.path.join(DATASETS_ROOT, 'commands_dataset')
-EXAMPLE_DURATION = 12
-EXAMPLE_SAMPLING_RATE = 16000
-TRIGGER_WORD = 'marvin'
 TRAINING_EXAMPLES_PATH = os.path.join(DATASETS_ROOT, 'training', 'examples')
 TRAINING_LABELS_PATH = os.path.join(DATASETS_ROOT, 'training', 'labels')
+
+TRIGGER_WORD = 'marvin'
+EXAMPLE_DURATION = 12
+EXAMPLE_SAMPLING_RATE = 16000
 TRAINING_EXAMPLES_COUNT = 20000
 MAX_POSITIVES_COUNT_IN_EXAMPLE = 4
 MAX_NEGATIVES_COUNT_IN_EXAMPLE = 5
@@ -24,4 +27,3 @@ CONV_STRIDE = 4
 FIRST_GRU_HIDDEN_SIZE = 128
 SECOND_GRU_HIDDEN_SIZE = 128
 
-CHECKPOINT_PATH = 'results'

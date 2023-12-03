@@ -3,7 +3,7 @@ import torchaudio
 from torch import Tensor
 from torchaudio.transforms import Spectrogram
 
-from src.constants import *
+from src.util.constants import *
 
 transform = Spectrogram(n_fft=FFT_SIZE, win_length=FFT_WIN_LENGTH, hop_length=FFT_HOP_LENGTH)
 

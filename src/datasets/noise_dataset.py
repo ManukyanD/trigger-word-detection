@@ -2,7 +2,7 @@ import soundata
 import torch
 from torchaudio.transforms import Resample
 
-from src.constants import EXAMPLE_SAMPLING_RATE, EXAMPLE_DURATION
+from src.util.constants import EXAMPLE_SAMPLING_RATE, EXAMPLE_DURATION
 
 
 class NoiseDataset:

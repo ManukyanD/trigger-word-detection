@@ -1,12 +1,12 @@
-import os
-
 import numpy as np
 import torch
 import torchaudio
 
 from src.datasets.command_dataset import CommandDataset
 from src.datasets.noise_dataset import NoiseDataset
-from src.constants import *
+from src.util.constants import *
+
+project_root = os.path.abspath(os.path.join('..', '..'))
 
 
 def construct_example(noise, positives, negatives):
@@ -44,17 +44,13 @@ def are_overlapping(start, end, previous_segments):
     return False
 
 
-def abs_path(*paths):
-    return os.path.abspath(os.path.join(*paths))
+noise_dataset = NoiseDataset(os.path.join(project_root, NOISE_DATASET_PATH))
+command_dataset = CommandDataset(os.path.join(project_root, COMMAND_DATASET_PATH))
 
-
-noise_dataset = NoiseDataset(abs_path('../', NOISE_DATASET_PATH))
-command_dataset = CommandDataset(abs_path('../', COMMAND_DATASET_PATH))
-
-examples_path = abs_path('../', TRAINING_EXAMPLES_PATH)
+examples_path = (os.path.join(project_root, TRAINING_EXAMPLES_PATH))
 os.makedirs(examples_path, exist_ok=True)
 
-labels_path = abs_path('../', TRAINING_LABELS_PATH)
+labels_path = os.path.join(project_root, TRAINING_LABELS_PATH)
 os.makedirs(labels_path, exist_ok=True)
 
 print('Generating dataset')

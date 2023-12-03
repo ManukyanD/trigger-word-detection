@@ -6,7 +6,7 @@ import torchaudio
 from torchaudio.datasets import SPEECHCOMMANDS
 from torchaudio.transforms import Resample
 
-from src.constants import EXAMPLE_SAMPLING_RATE, TRIGGER_WORD
+from src.util.constants import EXAMPLE_SAMPLING_RATE, TRIGGER_WORD
 
 
 class CommandDataset(SPEECHCOMMANDS):

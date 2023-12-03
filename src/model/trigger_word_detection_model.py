@@ -1,6 +1,6 @@
 import torch.nn as nn
 from torch import Tensor
-from src.constants import *
+from src.util.constants import *
 
 
 class TriggerWordDetectionModel(nn.Module):

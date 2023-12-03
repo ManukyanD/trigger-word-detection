@@ -2,15 +2,18 @@ import torch
 from torch.utils.data import DataLoader, random_split
 from torch.utils.tensorboard import SummaryWriter
 
-from src.constants import *
 from src.model.dataset import Dataset
 from src.model.trigger_word_detection_model import TriggerWordDetectionModel
-from src.model.util.device import to_device
+from src.util.constants import *
+from src.util.device import to_device
 
+project_root = os.path.abspath(os.path.join('..', '..'))
 summary_writer = SummaryWriter()
 EPOCHS_NUMBER = 40
 LEARNING_RATE = 1e-3
-checkpoint_path = os.path.join('../', CHECKPOINT_PATH, 'model.pt')
+os.makedirs(os.path.join(project_root, CHECKPOINT_PATH), exist_ok=True)
+checkpoint_path = os.path.join(project_root, CHECKPOINT_PATH, 'model.pt')
+
 
 def evaluate(model, val_loader, epoch):
     model.eval()
@@ -39,7 +42,7 @@ def fit(epochs, lr, model, train_loader, val_loader, opt_func):
         evaluate(model, val_loader, epoch)
         torch.save(model, checkpoint_path)
 
-os.makedirs(os.path.join('../', CHECKPOINT_PATH), exist_ok=True)
+
 if os.path.exists(checkpoint_path):
     model = torch.load(checkpoint_path)
 else:
@@ -47,8 +50,8 @@ else:
 
 to_device(model)
 training_set, validation_set = random_split(
-    Dataset(os.path.abspath(os.path.join('../', TRAINING_EXAMPLES_PATH)),
-            os.path.abspath(os.path.join('../', TRAINING_LABELS_PATH))),
+    Dataset(os.path.abspath(os.path.join(project_root, TRAINING_EXAMPLES_PATH)),
+            os.path.abspath(os.path.join(project_root, TRAINING_LABELS_PATH))),
     [0.8, 0.2])
 training_loader = DataLoader(dataset=training_set, batch_size=BATCH_SIZE, shuffle=True)
 validation_loader = DataLoader(dataset=validation_set, batch_size=BATCH_SIZE, shuffle=True)
