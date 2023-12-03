@@ -9,8 +9,8 @@ from src.util.device import to_device
 
 project_root = os.path.abspath(os.path.join('..', '..'))
 summary_writer = SummaryWriter()
-os.makedirs(os.path.join(project_root, CHECKPOINT_PATH), exist_ok=True)
-checkpoint_path = os.path.join(project_root, CHECKPOINT_PATH, 'model.pt')
+checkpoint_path = os.path.join(project_root, CHECKPOINT_PATH)
+os.makedirs(checkpoint_path, exist_ok=True)
 
 
 def fit(epochs, lr, model, train_loader, val_loader, opt_func):
@@ -27,7 +27,7 @@ def fit(epochs, lr, model, train_loader, val_loader, opt_func):
             training_loss_sum += loss.item()
         print_loss('Training loss', training_loss_sum / len(train_loader), epoch)
         evaluate(model, val_loader, epoch)
-        torch.save(model, checkpoint_path)
+        checkpoint(model, f'epoch-{epoch}.pt')
 
 
 def evaluate(model, val_loader, epoch):
@@ -46,11 +46,11 @@ def print_loss(tag, loss, epoch):
     print(f'Epoch: {epoch}, {tag}: {loss}')
 
 
-if os.path.exists(checkpoint_path):
-    model = torch.load(checkpoint_path)
-else:
-    model = TriggerWordDetectionModel()
+def checkpoint(model, filename):
+    torch.save(model, os.path.join(checkpoint_path, filename))
 
+
+model = TriggerWordDetectionModel()
 to_device(model)
 training_set, validation_set = random_split(
     Dataset(os.path.join(project_root, TRAINING_EXAMPLES_PATH),
