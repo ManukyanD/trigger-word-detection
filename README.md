@@ -8,3 +8,7 @@ Activate the virtual environment
 ```shell
 ./venv/Scripts/activate
 ```
+Run Tensorboard
+```shell
+tensorboard --logdir=./src/scripts/runs
+```

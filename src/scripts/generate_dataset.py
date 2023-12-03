@@ -54,7 +54,7 @@ labels_path = os.path.join(project_root, TRAINING_LABELS_PATH)
 os.makedirs(labels_path, exist_ok=True)
 
 print('Generating dataset')
-for index in range(TRAINING_EXAMPLES_COUNT):
+for index in range(EXAMPLES_COUNT):
     positives_count = np.random.randint(low=0, high=MAX_POSITIVES_COUNT_IN_EXAMPLE)
     positives = [command_dataset.random_positive() for i in range(positives_count)]
 
@@ -67,4 +67,4 @@ for index in range(TRAINING_EXAMPLES_COUNT):
     torchaudio.save(os.path.join(examples_path, f'{index}.wav'), example.unsqueeze(0), 16000)
     torch.save(y, os.path.join(labels_path, f'{index}.pt'))
 
-    print(f'\r{round(index / TRAINING_EXAMPLES_COUNT * 100, 2)} %', end='')
+    print(f'\r{round(index / EXAMPLES_COUNT * 100, 2)} %', end='')
