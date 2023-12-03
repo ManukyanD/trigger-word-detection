@@ -15,8 +15,7 @@ class TriggerWordDetectionDataset(Dataset):
     def __init__(self, examples_path, labels_path):
         self.examples_path = examples_path
         self.labels_path = labels_path
-        spectrogram_length = math.floor(
-            (EXAMPLE_DURATION * EXAMPLE_SAMPLING_RATE + 2 * FFT_HOP_LENGTH - FFT_WIN_LENGTH) / FFT_HOP_LENGTH) + 1
+        spectrogram_length = math.floor(EXAMPLE_DURATION * EXAMPLE_SAMPLING_RATE / FFT_HOP_LENGTH) + 1
         self.label_size = math.floor((spectrogram_length - CONV_KERNEL_SIZE) / CONV_STRIDE) + 1
 
     def __getitem__(self, item):
