@@ -12,7 +12,7 @@ summary_writer = SummaryWriter()
 checkpoint_path = os.path.join(project_root, CHECKPOINT_PATH)
 os.makedirs(checkpoint_path, exist_ok=True)
 result_model_path = os.path.join(project_root, RESULT_PATH, 'model.pt')
-os.makedirs(os.path.join(project_root, RESULT_PATH))
+os.makedirs(os.path.join(project_root, RESULT_PATH), exist_ok=True)
 
 
 def fit(epochs, lr, model, train_loader, val_loader, opt_func):
