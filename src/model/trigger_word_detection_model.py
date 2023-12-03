@@ -26,8 +26,10 @@ class TriggerWordDetectionModel(nn.Module):
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x: Tensor):
+        print(x.shape)
         x = x[:, 0, :, :]
         x = self.conv(x)
+        print(x.shape)
         x = self.batch_norm_1(x)
         x = self.relu_1(x)
         x = self.dropout_1(x)
