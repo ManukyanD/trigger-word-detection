@@ -2,7 +2,7 @@ import torch
 from torch.utils.data import DataLoader, random_split
 from torch.utils.tensorboard import SummaryWriter
 
-from src.model.dataset import Dataset
+from src.datasets.trigger_word_detection_dataset import TriggerWordDetectionDataset
 from src.model.trigger_word_detection_model import TriggerWordDetectionModel
 from src.util.constants import *
 from src.util.device import to_device
@@ -53,8 +53,8 @@ def checkpoint(model, filename):
 model = TriggerWordDetectionModel()
 to_device(model)
 training_set, validation_set = random_split(
-    Dataset(os.path.join(project_root, TRAINING_EXAMPLES_PATH),
-            os.path.join(project_root, TRAINING_LABELS_PATH)),
+    TriggerWordDetectionDataset(os.path.join(project_root, TRAINING_EXAMPLES_PATH),
+                                os.path.join(project_root, TRAINING_LABELS_PATH)),
     [0.8, 0.2])
 training_loader = DataLoader(dataset=training_set, batch_size=BATCH_SIZE, shuffle=True)
 validation_loader = DataLoader(dataset=validation_set, batch_size=BATCH_SIZE, shuffle=True)

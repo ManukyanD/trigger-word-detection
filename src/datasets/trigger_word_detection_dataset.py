@@ -1,6 +1,7 @@
 import torch
 import torchaudio
 from torch import Tensor
+from torch.utils.data import Dataset
 from torchaudio.transforms import Spectrogram
 
 from src.util.constants import *
@@ -8,7 +9,7 @@ from src.util.constants import *
 transform = Spectrogram(n_fft=FFT_SIZE, win_length=FFT_WIN_LENGTH, hop_length=FFT_HOP_LENGTH)
 
 
-class Dataset:
+class TriggerWordDetectionDataset(Dataset):
     def __init__(self, examples_path, labels_path):
         self.examples_path = examples_path
         self.labels_path = labels_path
