@@ -21,7 +21,7 @@ def fit(epochs, lr, model, train_loader, val_loader, opt_func):
         model.train(True)
         training_loss_sum = 0
         for batch in train_loader:
-            to_device(batch)
+            batch = to_device(batch)
             optimizer.zero_grad()
             loss = model.calculate_loss(batch)
             loss.backward()
@@ -37,7 +37,7 @@ def evaluate(model, val_loader, epoch):
     output_sum = 0
     with torch.no_grad():
         for batch in val_loader:
-            to_device(batch)
+            batch = to_device(batch)
             output = model.calculate_loss(batch)
             output_sum += output.item()
     print_loss('Validation loss', output_sum / len(val_loader), epoch)
