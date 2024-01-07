@@ -6,8 +6,6 @@ from src.datasets.command_dataset import CommandDataset
 from src.datasets.noise_dataset import NoiseDataset
 from src.util.constants import *
 
-project_root = os.path.abspath(os.path.join('..', '..'))
-
 
 def construct_example(noise, positives, negatives):
     segments = []
@@ -44,27 +42,29 @@ def are_overlapping(start, end, previous_segments):
     return False
 
 
-noise_dataset = NoiseDataset(os.path.join(project_root, NOISE_DATASET_PATH))
-command_dataset = CommandDataset(os.path.join(project_root, COMMAND_DATASET_PATH))
+def main():
+    noise_dataset = NoiseDataset(NOISE_DATASET_PATH)
+    command_dataset = CommandDataset(COMMAND_DATASET_PATH)
 
-examples_path = (os.path.join(project_root, TRAINING_EXAMPLES_PATH))
-os.makedirs(examples_path, exist_ok=True)
+    os.makedirs(TRAINING_EXAMPLES_PATH, exist_ok=True)
+    os.makedirs(TRAINING_LABELS_PATH, exist_ok=True)
 
-labels_path = os.path.join(project_root, TRAINING_LABELS_PATH)
-os.makedirs(labels_path, exist_ok=True)
+    print('Generating dataset')
+    for index in range(EXAMPLES_COUNT):
+        positives_count = np.random.randint(low=0, high=MAX_POSITIVES_COUNT_IN_EXAMPLE)
+        positives = [command_dataset.random_positive() for i in range(positives_count)]
 
-print('Generating dataset')
-for index in range(EXAMPLES_COUNT):
-    positives_count = np.random.randint(low=0, high=MAX_POSITIVES_COUNT_IN_EXAMPLE)
-    positives = [command_dataset.random_positive() for i in range(positives_count)]
+        negatives_count = np.random.randint(low=0, high=MAX_NEGATIVES_COUNT_IN_EXAMPLE)
+        negatives = [command_dataset.random_negative() for j in range(negatives_count)]
 
-    negatives_count = np.random.randint(low=0, high=MAX_NEGATIVES_COUNT_IN_EXAMPLE)
-    negatives = [command_dataset.random_negative() for j in range(negatives_count)]
+        noise = noise_dataset.random()
 
-    noise = noise_dataset.random()
+        example, y = construct_example(noise, positives, negatives)
+        torchaudio.save(os.path.join(TRAINING_EXAMPLES_PATH, f'{index}.wav'), example.unsqueeze(0), 16000)
+        torch.save(y, os.path.join(TRAINING_LABELS_PATH, f'{index}.pt'))
 
-    example, y = construct_example(noise, positives, negatives)
-    torchaudio.save(os.path.join(examples_path, f'{index}.wav'), example.unsqueeze(0), 16000)
-    torch.save(y, os.path.join(labels_path, f'{index}.pt'))
+        print(f'\r{round(index / EXAMPLES_COUNT * 100, 2)} %', end='')
 
-    print(f'\r{round(index / EXAMPLES_COUNT * 100, 2)} %', end='')
+
+if __name__ == '__main__':
+    main()
