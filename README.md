@@ -1,14 +1,15 @@
 # Trigger Word Detection
+A GRU-based trigger word detection model.
 
-Create python virtual environment and activate it
+Generate dataset
 ```shell
-python -m venv ./venv
+python generate_dataset.py
 ```
-Activate the virtual environment
+Train
 ```shell
-./venv/Scripts/activate
+python train.py
 ```
-Run Tensorboard
+Visualize
 ```shell
-tensorboard --logdir=./src/scripts/runs
+python visualize.py
 ```
