@@ -1,31 +1,33 @@
 import os.path
+import random
 from pathlib import Path
 
-import numpy as np
 import torchaudio
 from torchaudio.datasets import SPEECHCOMMANDS
-from torchaudio.transforms import Resample
 
-from src.util.constants import EXAMPLE_SAMPLING_RATE, TRIGGER_WORD
+from src.util.constants import COMMANDS_DATASET_PATH
 
 
 class CommandDataset(SPEECHCOMMANDS):
-    def __init__(self, root):
+    def __init__(self, args):
+        root = os.path.join(args.data_dir, COMMANDS_DATASET_PATH)
         os.makedirs(root, exist_ok=True)
         super().__init__(root, download=True)
-        root = os.path.join(root, 'SpeechCommands', 'speech_commands_v0.02')
-        all_files_list = sorted(str(path) for path in Path(root).glob('*/*.wav'))
-        example_files_list = [path for path in all_files_list if
-                              '_nohash_' in path and '_background_noise_' not in path]
-        positive_path_prefix = os.path.join(root, TRIGGER_WORD)
-        self.positives = [path for path in example_files_list if path.startswith(positive_path_prefix)]
-        self.negatives = [path for path in example_files_list if not path.startswith(positive_path_prefix)]
-        self.resampler = Resample(16000, EXAMPLE_SAMPLING_RATE)
+        base_dir = os.path.join(root, 'SpeechCommands', 'speech_commands_v0.02')
+        all_words = [dirname for dirname in os.listdir(base_dir) if
+                     os.path.isdir(os.path.join(base_dir, dirname)) and dirname != '_background_noise_']
+        if args.trigger_word not in all_words:
+            raise ValueError(
+                f'Unknown trigger word "{args.trigger_word}" was provided. Trigger word must be one of {all_words}.')
+        self.positives = [str(path) for path in Path(os.path.join(base_dir, args.trigger_word)).glob('*.wav')]
+        negative_words = [word for word in all_words if word != args.trigger_word]
+        self.negatives = [str(path) for neg in negative_words for path in
+                          Path(os.path.join(base_dir, neg)).glob('*.wav')]
 
     def random_negative(self):
-        audio, sample_rate = torchaudio.load(self.negatives[np.random.randint(low=0, high=len(self.negatives))])
-        return self.resampler(audio[0])
+        audio, sample_rate = torchaudio.load(random.choice(self.negatives))
+        return audio[0]
 
     def random_positive(self):
-        audio, sample_rate = torchaudio.load(self.positives[np.random.randint(low=0, high=len(self.positives))])
-        return self.resampler(audio[0])
+        audio, sample_rate = torchaudio.load(random.choice(self.positives))
+        return audio[0]

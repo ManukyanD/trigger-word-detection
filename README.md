@@ -9,7 +9,3 @@ Train
 ```shell
 python train.py
 ```
-Visualize
-```shell
-python visualize.py
-```

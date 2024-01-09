@@ -1,10 +1,32 @@
+import argparse
+import os
+
 import numpy as np
 import torch
 import torchaudio
 
 from src.datasets.command_dataset import CommandDataset
 from src.datasets.noise_dataset import NoiseDataset
-from src.util.constants import *
+from src.util.constants import TRAINING_EXAMPLES_PATH, TRAINING_LABELS_PATH, NOISE_DATASET_PATH, COMMANDS_DATASET_PATH
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--data-dir', type=str, default=os.path.join('.', 'data'),
+                        help='The data directory (default: "./data").')
+    parser.add_argument('--trigger-word', type=str, default='marvin',
+                        help='The trigger word (default: "marvin").')
+    parser.add_argument('--training-example-duration', type=int, default=12,
+                        help='The duration of training examples in seconds (default: 12).')
+    parser.add_argument('--max-num-pos', type=int, default=4,
+                        help='The maximum number of positives in one example (default: 4).')
+    parser.add_argument('--max-num-neg', type=int, default=5,
+                        help='The maximum number of negatives in one example (default: 5).')
+    parser.add_argument('--num-examples', type=int, default=20000,
+                        help='Number of examples to generate (default: 20000).')
+
+    return parser.parse_args()
 
 
 def construct_example(noise, positives, negatives):
@@ -43,27 +65,30 @@ def are_overlapping(start, end, previous_segments):
 
 
 def main():
-    noise_dataset = NoiseDataset(NOISE_DATASET_PATH)
-    command_dataset = CommandDataset(COMMAND_DATASET_PATH)
+    args = parse_args()
 
-    os.makedirs(TRAINING_EXAMPLES_PATH, exist_ok=True)
-    os.makedirs(TRAINING_LABELS_PATH, exist_ok=True)
+    command_dataset = CommandDataset(args)
+    noise_dataset = NoiseDataset(args)
+    training_examples_path = os.path.join(args.data_dir, TRAINING_EXAMPLES_PATH)
+    os.makedirs(training_examples_path, exist_ok=True)
+    training_labels_path = os.path.join(args.data_dir, TRAINING_LABELS_PATH)
+    os.makedirs(training_labels_path, exist_ok=True)
 
     print('Generating dataset')
-    for index in range(EXAMPLES_COUNT):
-        positives_count = np.random.randint(low=0, high=MAX_POSITIVES_COUNT_IN_EXAMPLE)
+    for index in range(args.num_examples):
+        positives_count = np.random.randint(low=0, high=args.max_num_pos)
         positives = [command_dataset.random_positive() for i in range(positives_count)]
 
-        negatives_count = np.random.randint(low=0, high=MAX_NEGATIVES_COUNT_IN_EXAMPLE)
+        negatives_count = np.random.randint(low=0, high=args.max_num_neg)
         negatives = [command_dataset.random_negative() for j in range(negatives_count)]
 
         noise = noise_dataset.random()
 
         example, y = construct_example(noise, positives, negatives)
-        torchaudio.save(os.path.join(TRAINING_EXAMPLES_PATH, f'{index}.wav'), example.unsqueeze(0), 16000)
-        torch.save(y, os.path.join(TRAINING_LABELS_PATH, f'{index}.pt'))
+        torchaudio.save(os.path.join(training_examples_path, f'{index}.wav'), example.unsqueeze(0), 16000)
+        torch.save(y, os.path.join(training_labels_path, f'{index}.pt'))
 
-        print(f'\r{round(index / EXAMPLES_COUNT * 100, 2)} %', end='')
+        print(f'\r{round(index / args.num_examples * 100, 2)} %', end='')
 
 
 if __name__ == '__main__':
