@@ -13,11 +13,15 @@ class TriggerWordDetectionDataset(Dataset):
     def __init__(self, args):
         self.examples_path = os.path.join(args.data_dir, TRAINING_EXAMPLES_PATH)
         self.labels_path = os.path.join(args.data_dir, TRAINING_LABELS_PATH)
-        self.transform = Spectrogram(n_fft=args.n_fft, win_length=args.fft_window_length,
-                                     hop_length=args.fft_hop_length)
+        self.transform = self.init_transform(args)
         self.hop_length = args.fft_hop_length
         self.conv_kernel_size = args.kernel_size
         self.conv_stride = args.stride
+
+    @staticmethod
+    def init_transform(args):
+        return Spectrogram(n_fft=args.n_fft, win_length=args.fft_window_length,
+                           hop_length=args.fft_hop_length)
 
     def __getitem__(self, item):
         audio, sample_rate = torchaudio.load(os.path.join(self.examples_path, f'{item}.wav'))

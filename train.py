@@ -1,4 +1,5 @@
 import argparse
+import json
 import os.path
 import random
 
@@ -56,10 +57,11 @@ def update_args(args):
     return args
 
 
-def fit(epochs, lr, model, train_loader, test_loader, opt_fn, loss_fn, checkpoints_dir, should_visualize):
-    optimizer = opt_fn(model.parameters(), lr)
+def fit(args, model, train_loader, test_loader, opt_fn, loss_fn):
+    args_dict = vars(args)
+    optimizer = opt_fn(model.parameters(), args.learning_rate)
     running_loss = 0
-    for epoch in range(1, epochs + 1):
+    for epoch in range(1, args.epochs + 1):
         model.train(True)
         for index, batch in enumerate(train_loader):
             batch = to_device(batch)
@@ -74,8 +76,8 @@ def fit(epochs, lr, model, train_loader, test_loader, opt_fn, loss_fn, checkpoin
             if step % 10 == 0:
                 report(running_loss / 10, step)
                 running_loss = 0
-        checkpoint(model, f'epoch-{epoch}.pt', checkpoints_dir)
-        evaluate(model, test_loader, loss_fn, epoch, should_visualize)
+        checkpoint(model, epoch, args_dict)
+        evaluate(model, test_loader, loss_fn, epoch, args.visualize)
 
 
 def evaluate(model, test_loader, loss_fn, epoch, should_visualize):
@@ -115,9 +117,12 @@ def report(loss, step):
     print(f'Training Step: {step}, Loss: {loss}')
 
 
-def checkpoint(model, filename, checkpoints_dir):
-    torch.save(model, os.path.join(checkpoints_dir, filename))
-    torch.save(model, MODEL_FILENAME)
+def checkpoint(model, epoch, args_dict):
+    path = os.path.join(args_dict.get('checkpoints_dir'), f'epoch-{epoch}')
+    os.makedirs(path, exist_ok=True)
+    torch.save(model, os.path.join(path, f'model.pt'))
+    with open(os.path.join(path, 'args.json'), 'w') as file:
+        json.dump(args_dict, file, indent=4)
 
 
 def main():
@@ -131,8 +136,7 @@ def main():
     training_loader = DataLoader(dataset=training_set, batch_size=args.batch_size, shuffle=True)
     test_loader = DataLoader(dataset=test_set, batch_size=args.batch_size, shuffle=True)
 
-    fit(args.epochs, args.learning_rate, model, training_loader, test_loader, torch.optim.Adam,
-        torch.nn.functional.binary_cross_entropy, args.checkpoints_dir, args.visualize)
+    fit(args, model, training_loader, test_loader, torch.optim.Adam, torch.nn.functional.binary_cross_entropy)
 
     summary_writer.close()
 
