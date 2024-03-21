@@ -58,10 +58,10 @@ def update_args(args):
 
 def fit(epochs, lr, model, train_loader, test_loader, opt_fn, loss_fn, checkpoints_dir, should_visualize):
     optimizer = opt_fn(model.parameters(), lr)
+    running_loss = 0
     for epoch in range(1, epochs + 1):
         model.train(True)
-        training_loss_sum = 0
-        for batch in train_loader:
+        for index, batch in enumerate(train_loader):
             batch = to_device(batch)
             x, y = batch
             prediction = model(x)
@@ -69,23 +69,29 @@ def fit(epochs, lr, model, train_loader, test_loader, opt_fn, loss_fn, checkpoin
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            training_loss_sum += loss.item()
-        print_loss('Training loss', training_loss_sum / len(train_loader), epoch)
-        evaluate(model, test_loader, loss_fn, epoch, should_visualize)
+            running_loss += loss.item()
+            step = (epoch - 1) * len(train_loader) + index + 1
+            if step % 10 == 0:
+                report(running_loss / 10, step)
+                running_loss = 0
         checkpoint(model, f'epoch-{epoch}.pt', checkpoints_dir)
+        evaluate(model, test_loader, loss_fn, epoch, should_visualize)
 
 
 def evaluate(model, test_loader, loss_fn, epoch, should_visualize):
     model.eval()
     test_loss_sum = 0
     with torch.no_grad():
-        for batch in test_loader:
+        for index, batch in enumerate(test_loader):
             batch = to_device(batch)
             x, y = batch
             prediction = model(x)
             loss = loss_fn(prediction, y)
             test_loss_sum += loss.item()
-    print_loss('Test loss', test_loss_sum / len(test_loader), epoch)
+            batch_num = index + 1
+            if batch_num % 10 == 0:
+                print(f'Epoch: {epoch}, Batches: up to {batch_num}, Test Loss: {test_loss_sum / batch_num}')
+    print(f'Epoch: {epoch}, Overall Test Loss: {test_loss_sum / len(test_loader)}')
     if should_visualize:
         batch_size = prediction.size(0)
         rand_index = random.randint(0, batch_size - 1)
@@ -104,9 +110,9 @@ def visualize(prediction, label, epoch):
     plt.show()
 
 
-def print_loss(tag, loss, epoch):
-    summary_writer.add_scalar(tag, loss, epoch)
-    print(f'Epoch: {epoch}, {tag}: {loss}')
+def report(loss, step):
+    summary_writer.add_scalar('Train/Loss', loss, step)
+    print(f'Training Step: {step}, Loss: {loss}')
 
 
 def checkpoint(model, filename, checkpoints_dir):
@@ -127,6 +133,8 @@ def main():
 
     fit(args.epochs, args.learning_rate, model, training_loader, test_loader, torch.optim.Adam,
         torch.nn.functional.binary_cross_entropy, args.checkpoints_dir, args.visualize)
+
+    summary_writer.close()
 
 
 if __name__ == '__main__':
